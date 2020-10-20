@@ -789,6 +789,12 @@
     <ClInclude Include="NonRenderableObject.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
+    <ClInclude Include="IUpdater.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderer.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="glm\detail\func_common.inl">

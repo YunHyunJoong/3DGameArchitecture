@@ -1,2 +1,8 @@
-﻿  main.cpp
-  OpenGlSample.vcxproj -> C:\Users\Public\make-rotation-light-YunHyunJoong\OpenGlSample\x64\Debug\OpenGlSample.exe
+﻿  FileManager.cpp
+  RenderableObject.cpp
+  Renderer.cpp
+D:\문서\git\3DGameArchitecture\OpenGlSample\Renderer.cpp(131,56): warning C4267: '인수': 'size_t'에서 'GLsizei'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Sphere.cpp
+  main.cpp
+  코드를 생성하고 있습니다...
+  OpenGlSample.vcxproj -> D:\문서\git\3DGameArchitecture\x64\Debug\OpenGlSample.exe

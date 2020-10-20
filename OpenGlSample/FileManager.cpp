@@ -5,15 +5,15 @@
 #include <sstream>
 #include <fstream>
 
-#include "RenderableObject.h"
 #include "Object.h"
 #include "FileManager.h"
-
+#include "RenderableObject.h"
 #include "include/GL/glew.h"
 
 #define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
 #define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
 #define FOURCC_DXT5 0x35545844 // Equivalent to "DXT5" in ASCII
+
 
 void FileManager::loadObj(
 	RenderableObject* target_obj,
@@ -22,47 +22,56 @@ void FileManager::loadObj(
 	std::string vs_shader_path,
 	std::string fs_shader_path)
 {
-	glGenVertexArrays(1, &target_obj->VertexArrayID);
-	glBindVertexArray(target_obj->VertexArrayID);
+	{
+		glGenVertexArrays(1, &target_obj->VertexArrayID);
+		glBindVertexArray(target_obj->VertexArrayID);
 
-	target_obj->programID = LoadShaders(vs_shader_path.c_str(), fs_shader_path.c_str());
+		// Create and compile our GLSL program from the shaders
+		target_obj->programID = loadShaders(vs_shader_path.c_str(), fs_shader_path.c_str());
 
-	// Get a handle for our "MVP" uniform
+	}
+
+
+	//MVP
 	target_obj->MatrixID = glGetUniformLocation(target_obj->programID, "MVP");
 	target_obj->ViewMatrixID = glGetUniformLocation(target_obj->programID, "V");
 	target_obj->ModelMatrixID = glGetUniformLocation(target_obj->programID, "M");
 
-	// Load the texture
-	target_obj->Texture = loadDDS(texture_path.c_str());
+	{
+		target_obj->Texture = loadDDS(texture_path.c_str());
 
-	// Get a handle for our "myTextureSampler" uniform
-	target_obj->TextureID = glGetUniformLocation(target_obj->programID, "myTextureSampler");
+		// Get a handle for our "myTextureSampler" uniform
+		target_obj->TextureID = glGetUniformLocation(target_obj->programID, "myTextureSampler");
+	}
 
-	loadOBJ(obj_path.c_str(), target_obj->vertices, target_obj->uvs, target_obj->normals);
+	{
+		loadOBj(obj_path.c_str(), target_obj->vertices, target_obj->uvs, target_obj->normals);
 
-	glGenBuffers(1, &target_obj->vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, target_obj->vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, target_obj->vertices.size() * sizeof(glm::vec3), &target_obj->vertices[0], GL_STATIC_DRAW);
+		glGenBuffers(1, &target_obj->vertexbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, target_obj->vertexbuffer);
+		glBufferData(GL_ARRAY_BUFFER, target_obj->vertices.size() * sizeof(glm::vec3), &target_obj->vertices[0], GL_STATIC_DRAW);
 
-	glGenBuffers(1, &target_obj->uvbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, target_obj->uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, target_obj->uvs.size() * sizeof(glm::vec2), &target_obj->uvs[0], GL_STATIC_DRAW);
+		glGenBuffers(1, &target_obj->uvbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, target_obj->uvbuffer);
+		glBufferData(GL_ARRAY_BUFFER, target_obj->uvs.size() * sizeof(glm::vec2), &target_obj->uvs[0], GL_STATIC_DRAW);
 
-	glGenBuffers(1, &target_obj->normalbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, target_obj->normalbuffer);
-	glBufferData(GL_ARRAY_BUFFER, target_obj->normals.size() * sizeof(glm::vec3), &target_obj->normals[0], GL_STATIC_DRAW);
+		glGenBuffers(1, &target_obj->normalbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, target_obj->normalbuffer);
+		glBufferData(GL_ARRAY_BUFFER, target_obj->normals.size() * sizeof(glm::vec3), &target_obj->normals[0], GL_STATIC_DRAW);
+	}
 
-	// Get a handle for our "LightPosition" uniform
-	glUseProgram(target_obj->programID);
-	target_obj->LightID = glGetUniformLocation(target_obj->programID, "LightPosition_worldspace");
+	{
+		glUseProgram(target_obj->programID);
+		target_obj->LightID = glGetUniformLocation(target_obj->programID, "LightPosition_worldspace");
+	}
+
 }
 
-bool FileManager::loadOBJ(
+bool FileManager::loadOBj(
 	const char* path,
 	std::vector<glm::vec3>& out_vertices,
 	std::vector<glm::vec2>& out_uvs,
-	std::vector<glm::vec3>& out_normals
-) 
+	std::vector<glm::vec3>& out_normals)
 {
 	printf("Loading OBJ file %s...\n", path);
 
@@ -144,7 +153,7 @@ bool FileManager::loadOBJ(
 		glm::vec3 vertex = temp_vertices[vertexIndex - 1];
 		glm::vec2 uv = temp_uvs[uvIndex - 1];
 		glm::vec3 normal = temp_normals[normalIndex - 1];
-		
+
 		// Put the attributes in buffers
 		out_vertices.push_back(vertex);
 		out_uvs.push_back(uv);
@@ -155,8 +164,8 @@ bool FileManager::loadOBJ(
 	return true;
 }
 
-GLuint FileManager::loadDDS(const char* imagepath) {
-
+GLuint FileManager::loadDDS(const char* imagepath)
+{
 	unsigned char header[124];
 
 	FILE* fp;
@@ -248,7 +257,8 @@ GLuint FileManager::loadDDS(const char* imagepath) {
 
 }
 
-GLuint FileManager::LoadShaders(const char* vertex_file_path, const char* fragment_file_path) {
+GLuint FileManager::loadShaders(const char* vertex_file_path, const char* fragment_file_path)
+{
 
 	// Create the shaders
 	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);

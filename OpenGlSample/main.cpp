@@ -1,14 +1,15 @@
-#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARINGS
 
 #pragma comment(lib, "OpenGL32.lib")
 #pragma comment(lib, "lib-vc2017/glew32.lib")
 #pragma comment(lib, "lib-vc2017/glfw3.lib")
 
-#include "RenderableObject.h"
+#include "Object.h"
 #include "FileManager.h"
 #include "Renderer.h"
+#include "RenderableObject.h"
+#include "NonRenderableObject.h"
 #include "Sphere.h"
-#include "Object.h"
 
 int main()
 {
@@ -18,7 +19,7 @@ int main()
 	renderer->init();
 
 	RenderableObject* cube = new RenderableObject();
-	//Sphere* sphere = new Sphere();
+	cube->setPosition(2.0f, 2.0f, 0.0f);
 
 	filemgr->loadObj(
 		cube,
@@ -26,22 +27,30 @@ int main()
 		"uvtemplate.DDS",
 		"20161651_vs.shader",
 		"20161651_fs.shader"
-		);
-	
-	cube->setPosition(2.0f, 2.0f, 0.0f);
+	);
+
+	Sphere* sphere = new Sphere(filemgr);
+	renderer->addObject(sphere);
+
+	NonRenderableObject* non_render_obj = new NonRenderableObject();
 
 	while (true)
 	{
-		renderer->render(cube);
-		//renderer->render(sphere);
-	}
+		renderer->renderClear();
 
+		renderer->render(cube);
+		renderer->render(sphere);
+		renderer->update(non_render_obj);
+
+		renderer->renderOff();
+	}
 	cube->shutDown();
-	//sphere->shutDown();
+	sphere->shutDown();
 	renderer->shutDown();
-	
+
 	delete cube;
-	//delete sphere;
+	delete sphere;
+	delete non_render_obj;
 
 	return 0;
 }

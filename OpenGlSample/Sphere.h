@@ -6,14 +6,12 @@
 
 class Sphere : public RenderableObject
 {
-private:
-	FileManager* filemgr;
 
 public:
-	Sphere();
-
-public:
+	Sphere(FileManager* filepath);
 	virtual void shutDown() override;
+	virtual	void setPosition(float x, float y, float z);
+public:
 };
 
 #endif // !__SPHERE_H__
