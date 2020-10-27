@@ -10,6 +10,7 @@
 #include "RenderableObject.h"
 #include "NonRenderableObject.h"
 #include "Sphere.h"
+#include "Human.h"
 
 int main()
 {
@@ -19,12 +20,12 @@ int main()
 	renderer->init();
 
 	RenderableObject* cube = new RenderableObject();
-	cube->setPosition(2.0f, 2.0f, 0.0f);
+	renderer->addObject(cube);
 
 	filemgr->loadObj(
 		cube,
-		"cube.obj",
-		"uvtemplate.DDS",
+		"ground.obj",
+		"grass.bmp",
 		"20161651_vs.shader",
 		"20161651_fs.shader"
 	);
@@ -32,24 +33,39 @@ int main()
 	Sphere* sphere = new Sphere(filemgr);
 	renderer->addObject(sphere);
 
+	Human* human = new Human(filemgr);
+	renderer->addObject(human);
+
+	cube->setPosition(2.0f, -50.0f, 0.0f);
+	sphere->setPosition(7.0f, 13.0f, 0.0f);
+	human->setPosition(0.0f, 1.0f, 0.0f);
+
+	cube->setMove(false);
+	sphere->setMove(true);
+	human->setMove(true);
+
+	renderer->setCameraPosition(0, 5, 20);
+
 	NonRenderableObject* non_render_obj = new NonRenderableObject();
 
 	while (true)
 	{
 		renderer->renderClear();
 
-		renderer->render(cube);
-		renderer->render(sphere);
+		renderer->addrender();
+
 		renderer->update(non_render_obj);
 
 		renderer->renderOff();
 	}
 	cube->shutDown();
 	sphere->shutDown();
+	human->shutDown();
 	renderer->shutDown();
 
 	delete cube;
 	delete sphere;
+	delete human;
 	delete non_render_obj;
 
 	return 0;

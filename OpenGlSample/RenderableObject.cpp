@@ -7,7 +7,6 @@
 
 void RenderableObject::shutDown()
 {
-	// Cleanup VBO and shader
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteBuffers(1, &uvbuffer);
 	glDeleteBuffers(1, &normalbuffer);
@@ -21,4 +20,14 @@ void RenderableObject::setPosition(float x, float y, float z)
 	OBJPosition_x = x;
 	OBJPosition_y = y;
 	OBJPosition_z = z;
+}
+
+void RenderableObject::setMove(bool check)
+{
+	isMoveCheck = check;
+}
+
+bool RenderableObject::getMove()
+{
+	return isMoveCheck;
 }

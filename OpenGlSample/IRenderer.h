@@ -1,6 +1,8 @@
 #ifndef __IRENDERER_H__
 #define __IRENDERER_H__
 
+#include <vector>
+
 class IRenderer
 {
 public:

@@ -8,7 +8,7 @@ Sphere::Sphere(FileManager* filepath)
 
 	programID = filepath->loadShaders("20161651_vs.shader", "20161651_fs.shader");
 
-	Texture = filepath->loadDDS("uvtemplate.DDS");
+	Texture = filepath->loadBMP("star.bmp");
 
 	MatrixID = glGetUniformLocation(programID, "MVP");
 	ViewMatrixID = glGetUniformLocation(programID, "V");

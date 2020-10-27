@@ -25,7 +25,7 @@ void Renderer::init()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow(1024, 768, "Tutorial 08 - Basic Shading", NULL, NULL);
+	window = glfwCreateWindow(1024, 768, "20161651Midterm", NULL, NULL);
 	if (window == NULL) {
 		fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
 		getchar();
@@ -49,7 +49,7 @@ void Renderer::init()
 	glfwSetCursorPos(window, 1024 / 2, 768 / 2);
 
 	// Dark blue background
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
 
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -63,21 +63,69 @@ void Renderer::init()
 
 void Renderer::render(RenderableObject* src_obj)
 {
-	// Use our shader
 	glUseProgram(src_obj->programID);
 
-	// Compute the MVP matrix from keyboard and mouse input
-	glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-	// Camera matrix
-	glm::mat4 ViewMatrix = glm::lookAt(
-		glm::vec3(0, 5, 7), // Camera is at (4,3,3), in World Space
-		glm::vec3(0, 0, 0), // and looks at the origin
-		glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
-	);
+	Controller* controller = Controller::instance();
+
+	controller->MatrixInput();
+
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+
+	controller->horizontalAngle += controller->mouseSpeed * float(1024 / 2 - xpos);
+	controller->verticalAngle += controller->mouseSpeed * float(768 / 2 - ypos);
+
+	glm::mat4 ProjectionMatrix = controller->getProjectionMatrix();
+
+	glm::mat4 ViewMatrix = controller->getViewMatrix();
+
 	glm::mat4 ModelMatrix = glm::mat4(1.0);
 	ModelMatrix = getPosition(ModelMatrix, src_obj);
 
-	glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+	float FoV = initialFoV;
+
+	glm::mat4 MoveObjectPosition = glm::mat4(1.0f);
+	MoveObjectPosition = glm::translate(MoveObjectPosition, src_obj->ObjPosition);
+
+	glm::mat4 MoveCameraPosition = glm::mat4(1.0f);
+	MoveCameraPosition = glm::translate(MoveCameraPosition, CameraPosition);
+
+	glm::mat4 Projection = glm::perspective(glm::radians(FoV), 4.0f / 3.0f, 0.1f, 100.0f);
+
+	glm::vec3 Direction(
+		cos(controller->verticalAngle) * sin(controller->horizontalAngle),
+		sin(controller->verticalAngle),
+		cos(controller->verticalAngle) * cos(controller->horizontalAngle)
+	);
+
+	glm::vec3 Right = glm::vec3(
+		sin(controller->horizontalAngle - 3.14f / 2.0f),
+		0,
+		cos(controller->horizontalAngle - 3.14f / 2.0f)
+	);
+
+	glm::vec3 Position = glm::vec3(0, 0, 5);
+
+	glm::vec3 Up = glm::cross(Right, Direction);
+
+	glm::mat4 View = glm::lookAt(
+		Position,
+		Position + Direction,
+		Up
+	);
+
+	glm::mat4 World = glm::mat4(1.0f);
+
+	glm::mat4 MVP;
+
+	if (src_obj->getMove() == true)
+	{
+		MVP = ProjectionMatrix * MoveCameraPosition * ViewMatrix * MoveObjectPosition * ModelMatrix;
+	}
+	else
+	{
+		MVP = Projection * MoveCameraPosition * View * MoveObjectPosition * World;
+	}
 
 	glUniformMatrix4fv(src_obj->MatrixID, 1, GL_FALSE, &MVP[0][0]);
 	glUniformMatrix4fv(src_obj->ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
@@ -86,11 +134,9 @@ void Renderer::render(RenderableObject* src_obj)
 	glm::vec3 lightPos = glm::vec3(0, 10, 0);
 	glUniform3f(src_obj->LightID, lightPos.x, lightPos.y, lightPos.z);
 
-
-	// Bind our texture in Texture Unit 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, src_obj->Texture);
-	// Set our "myTextureSampler" sampler to use Texture Unit 0
+
 	glUniform1i(src_obj->TextureID, 0);
 
 	glEnableVertexAttribArray(0);
@@ -135,9 +181,22 @@ void Renderer::render(RenderableObject* src_obj)
 	glDisableVertexAttribArray(2);
 }
 
+void Renderer::addrender()
+{
+	for (int i = 0; i < Objects.size(); i++)
+	{
+		render(Objects[i]);
+	}
+}
+
 void Renderer::shutDown()
 {
 	glfwTerminate();
+}
+
+void Renderer::setCameraPosition(float x, float y, float z)
+{
+	CameraPosition = glm::vec3(-x, -y, -z);
 }
 
 glm::mat4 Renderer::getPosition(glm::mat4 Model, RenderableObject* src_obj)
@@ -156,24 +215,9 @@ void Renderer::update(IUpdater* src_obj)
 	src_obj->update();
 }
 
-void Renderer::addObject(IRenderer* render_obj)
+void Renderer::addObject(RenderableObject* render_obj)
 {
-	render_obj->VertexArrayID;
-	render_obj->programID;
-	render_obj->MatrixID;
-	render_obj->ViewMatrixID;
-	render_obj->ModelMatrixID;
-	render_obj->Texture;
-	render_obj->TextureID;
-
-	render_obj->vertices;
-	render_obj->uvs;
-	render_obj->normals;
-
-	render_obj->vertexbuffer;
-	render_obj->uvbuffer;
-	render_obj->normalbuffer;
-	render_obj->LightID;
+	Objects.push_back(render_obj);
 }
 
 void Renderer::renderClear()
@@ -183,6 +227,11 @@ void Renderer::renderClear()
 
 void Renderer::renderOff()
 {
+	if (glfwGetKey(GetWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		exit(0);
+	}
+
 	glfwSwapBuffers(GetWindow());
 	glfwPollEvents();
 }
