@@ -377,6 +377,7 @@
     <ClInclude Include="RenderableObject.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Time.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="20161651_fs.shader" />
@@ -526,6 +527,7 @@
     <ClCompile Include="RenderableObject.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="Time.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

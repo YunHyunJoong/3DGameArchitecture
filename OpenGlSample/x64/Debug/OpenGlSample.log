@@ -1,4 +1,7 @@
-﻿  FileManager.cpp
-  Sphere.cpp
+﻿  Time.cpp
+D:\문서\git\3DGameArchitecture\OpenGlSample\Time.cpp(19,23): warning C4244: '초기화 중': 'LONGLONG'에서 'double'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  main.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': 매크로 재정의
+D:\문서\git\3DGameArchitecture\OpenGlSample\include\GLFW\glfw3.h(123): message : 'APIENTRY'의 이전 정의를 참조하십시오.
   코드를 생성하고 있습니다...
   OpenGlSample.vcxproj -> D:\문서\git\3DGameArchitecture\x64\Debug\OpenGlSample.exe

@@ -11,6 +11,7 @@
 #include "NonRenderableObject.h"
 #include "Sphere.h"
 #include "Human.h"
+#include "Time.h"
 
 int main()
 {
@@ -48,13 +49,19 @@ int main()
 
 	NonRenderableObject* non_render_obj = new NonRenderableObject();
 
+	Time* time = new Time();
+	time->init();
+
 	while (true)
 	{
 		renderer->renderClear();
 
 		renderer->addrender();
 
-		renderer->update(non_render_obj);
+		if (time->isRenderTiming())
+		{
+			renderer->update(non_render_obj);
+		}
 
 		renderer->renderOff();
 	}
